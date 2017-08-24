@@ -2,5 +2,5 @@
 # vi: set ft=ruby :
 
 Vagrant.configure("2") do |config|
-  config.vm.box = "iamseth/rhel-7.3"
+  config.vm.box = "rsnhill/rhel-6.8.virtualbox.box"
 end
