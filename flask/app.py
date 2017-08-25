@@ -31,17 +31,17 @@ celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
 celery.conf.update(app.config)
 
 
-@celery.task
-def create_job(msg):
+@celery.task(bind=True)
+def create_job(json):
     """ Celery task to create and process job
     """
-    
+    return job_id
 
 
 @app.route('/submit', methods=['POST'])
 def submit():
     validate(request.form)
-    job_id = create_job(request.form)
+    job_id = create_job.delay(request.form)
     results = {}
     results['job_id'] = job_id
     response = jsonify(results)
