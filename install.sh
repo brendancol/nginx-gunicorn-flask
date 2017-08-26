@@ -22,5 +22,10 @@ service nginx start
 
 # create supervisor config folder and copy config files to it
 mkdir /etc/supervisor
-cp $APPS_DIR/devops/supervisord.conf /etc/supervisor
-cp $APPS_DIR/devops/gunicorn_supervisor.ini
+cp $APPS_DIR/devops/supervisord.conf /etc/supervisor/
+cp $APPS_DIR/devops/gunicorn_supervisor.ini /etc/supervisor/
+
+cp $APPS_DIR/devops/supervisord.sh /etc/init.d/
+chmod +x /etc/init.d/supervisor.sh
+/etc/init.d/supervisor.sh start
+chkconfig --add supervisord
