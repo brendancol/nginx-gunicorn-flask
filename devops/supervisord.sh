@@ -1,130 +1,116 @@
-# Supervisord auto-start
+#!/bin/bash
 #
-# description: Auto-starts supervisord
+# supervisord   Startup script for the Supervisor process control system
+#
+# Author:       Mike McGrath <mmcgrath@redhat.com> (based off yumupdatesd)
+#               Jason Koppe <jkoppe@indeed.com> adjusted to read sysconfig,
+#                   use supervisord tools to start/stop, conditionally wait
+#                   for child processes to shutdown, and startup later
+#               Erwan Queffelec <erwan.queffelec@gmail.com>
+#                   make script LSB-compliant
+#
+# chkconfig:    345 83 04
+# description: Supervisor is a client/server system that allows \
+#   its users to monitor and control a number of processes on \
+#   UNIX-like operating systems.
 # processname: supervisord
+# config: /etc/supervisord.conf
+# config: /etc/sysconfig/supervisord
 # pidfile: /var/run/supervisord.pid
+#
+### BEGIN INIT INFO
+# Provides: supervisord
+# Required-Start: $all
+# Required-Stop: $all
+# Short-Description: start and stop Supervisor process control system
+# Description: Supervisor is a client/server system that allows
+#   its users to monitor and control a number of processes on
+#   UNIX-like operating systems.
+### END INIT INFO
 
-PATH=/sbin:/usr/sbin:/bin:/usr/bin
-NAME=supervisord
-DESC="supervisod is a system for controlling process state"
-SUPERVISORD=/usr/local/bin/supervisord
-SUPERVISORCTL=/usr/local/bin/supervisorctl
-SCRIPTNAME=/etc/init.d/$NAME
+# Source function library
+. /etc/rc.d/init.d/functions
 
+# Source system settings
+if [ -f /etc/sysconfig/supervisord ]; then
+    . /etc/sysconfig/supervisord
+fi
 
-# Read configuration variable file if it is present
-[ -r /etc/default/$NAME ] && . /etc/default/$NAME
+# Path to the supervisorctl script, server binary,
+# and short-form for messages.
+supervisorctl=/home/vagrant/miniconda2/bin/supervisorctl
+supervisord=/home/vagrant/miniconda2/bin/supervisord
+prog=supervisord
+pidfile=${PIDFILE-/tmp/supervisord.pid}
+lockfile=${LOCKFILE-/var/lock/subsys/supervisord}
+STOP_TIMEOUT=${STOP_TIMEOUT-60}
+OPTIONS="${OPTIONS--c /etc/supervisor/supervisord.conf}"
+RETVAL=0
 
-# Load the VERBOSE setting and other rcS variables
-. /lib/init/vars.sh
-
-# Define LSB log_* functions.
-# Depend on lsb-base (>= 3.2-14) to ensure that this file is present
-# and status_of_proc is working.
-. /lib/lsb/init-functions
-
-
-do_start()
-{
-    # Return
-    #   0 if daemon has been started
-    #   1 if daemon was already running
-    #   2 if daemon could not be started
-
-    if $SUPERVISORCTL status | grep -q "unix:///tmp/supervisor.sock no such file"; then
-        $SUPERVISORD
-        echo "supervisord started successfully"
-        return 0
+start() {
+    echo -n $"Starting $prog: "
+    daemon --pidfile=${pidfile} $supervisord $OPTIONS
+    RETVAL=$?
+    echo
+    if [ $RETVAL -eq 0 ]; then
+        touch ${lockfile}
+        $supervisorctl $OPTIONS status
     fi
-
-    if $SUPERVISORCTL status | grep -qv "unix:///tmp/supervisor.sock no such file"; then
-        echo "supervisord is already running"
-        return 1
-    fi
-
-    echo "could not start supervisord"
-    return 2
+    return $RETVAL
 }
 
-do_stop() {
-    # Return
-    #   0 if daemon has been stopped
-    #   1 if daemon was already stopped
-    #   2 if daemon could not be stopped
-    #   other if a failure occurred
-    if $SUPERVISORCTL status | grep -q "unix:///tmp/supervisor.sock no such file"; then
-        echo "supervisord already stopped"
-        return 1
+stop() {
+    echo -n $"Stopping $prog: "
+    killproc -p ${pidfile} -d ${STOP_TIMEOUT} $supervisord
+    RETVAL=$?
+    echo
+    [ $RETVAL -eq 0 ] && rm -rf ${lockfile} ${pidfile}
+}
+
+reload() {
+    echo -n $"Reloading $prog: "
+    LSB=1 killproc -p $pidfile $supervisord -HUP
+    RETVAL=$?
+    echo
+    if [ $RETVAL -eq 7 ]; then
+        failure $"$prog reload"
     else
-        if $SUPERVISORCTL shutdown | grep -q "Shut down"; then
-            while $SUPERVISORCTL shutdown | grep -q "already shutting down"
-            do
-                sleep 1
-            done
-            echo 'supervisor shutdown successfully'
-            return 0
-        else
-            echo "could not stop supervisord"
-            return 2
-        fi
+        $supervisorctl $OPTIONS status
     fi
 }
 
-do_status() {
-    if $SUPERVISORCTL status; then
-        $SUPERVISORCTL status
-        echo
-        return 3
-    fi
+restart() {
+    stop
+    start
 }
 
 case "$1" in
-  start)
-    [ "$VERBOSE" != no ] && log_daemon_msg "Starting $DESC" "$NAME"
-    do_start
-    case "$?" in
-        0|1) [ "$VERBOSE" != no ] && log_end_msg 0 ;;
-        2) [ "$VERBOSE" != no ] && log_end_msg 1 ;;
-    esac
-    ;;
-  stop)
-    [ "$VERBOSE" != no ] && log_daemon_msg "Stopping $DESC" "$NAME"
-    do_stop
-    case "$?" in
-        0|1) [ "$VERBOSE" != no ] && log_end_msg 0 ;;
-        2) [ "$VERBOSE" != no ] && log_end_msg 1 ;;
-    esac
-    ;;
-  status)
-    do_status
-    exit $?
-    ;;
-  restart|force-reload)
-    #
-    # If the "reload" option is implemented then remove the
-    # 'force-reload' alias
-    #
-    log_daemon_msg "Restarting $NAME"
-    do_stop
-    case "$?" in
-      0|1)
-        do_start
-        case "$?" in
-            0) log_end_msg 0 ;;
-            1) log_end_msg 1 ;; # Old process is still running
-            *) log_end_msg 1 ;; # Failed to start
-        esac
+    start)
+        start
         ;;
-      *)
-        # Failed to stop
-        log_end_msg 1
+    stop)
+        stop
         ;;
+    status)
+        status -p ${pidfile} $supervisord
+        RETVAL=$?
+        [ $RETVAL -eq 0 ] && $supervisorctl $OPTIONS status
+        ;;
+    restart)
+        restart
+        ;;
+    condrestart|try-restart)
+        if status -p ${pidfile} $supervisord >&/dev/null; then
+          stop
+          start
+        fi
+        ;;
+    force-reload|reload)
+        reload
+        ;;
+    *)
+        echo $"Usage: $prog {start|stop|restart|condrestart|try-restart|force-reload|reload}"
+        RETVAL=2
     esac
-    ;;
-  *)
-    echo "Usage: $SCRIPTNAME {start|stop|status|restart|force-reload}" >&2
-    exit 3
-    ;;
-esac
 
-:
+    exit $RETVAL
