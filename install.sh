@@ -1,16 +1,26 @@
 # master install file for processing architecture (RHEL)
 
+APPS_DIR=/opt/apps
+
 # install nginx repository
 rpm -Uvh http://nginx.org/packages/centos/6/noarch/RPMS/nginx-release-centos-6-0.el6.ngx.noarch.rpm
 
 # install nginx
 yum install nginx
 
+# install supervisor, gunicorn
+conda install supervisor -y
+conda install gunicorn -y
 
-wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh
-chmod a+x Miniconda2-latest-Linux-x86_64.sh
-./Minicocurl -sSL https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -o /tmp/miniconda.shnda2-latest-Linux-x86_64.sh
+# copy the conf files to the correct place
 
-curl -sSL https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -o /tmp/miniconda.sh
-bash /tmp/miniconda.sh -bfp /usr/local
-rm -rf /tmp/miniconda.sh
+service nginx stop
+mv /etc/nginx/nginx.conf /etc/nginx/nginx.conf-orig
+cp $APPS_DIR/devops/nginx.conf /etc/nginx/
+
+service nginx start
+
+# create supervisor config folder and copy config files to it
+mkdir /etc/supervisor
+cp $APPS_DIR/devops/supervisord.conf /etc/supervisor
+cp $APPS_DIR/devops/gunicorn_supervisor.ini
