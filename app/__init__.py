@@ -1,6 +1,6 @@
 from flask import Flask
 from werkzeug.contrib.fixers import ProxyFix
-from flask.ext.cors import CORS
+from flask_cors import CORS
 
 import logging
 import logging.handlers

@@ -5,7 +5,7 @@ import time
 
 # - third-party
 from flask import jsonify
-from flask.ext.restful import reqparse
+from flask_restful import reqparse
 
 # - app specific
 from app import app
