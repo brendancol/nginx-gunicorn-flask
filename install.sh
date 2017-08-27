@@ -3,10 +3,10 @@
 APPS_DIR=/opt/apps
 
 # install nginx repository
-rpm -Uvh http://nginx.org/packages/centos/6/noarch/RPMS/nginx-release-centos-6-0.el6.ngx.noarch.rpm
+sudo rpm -U --quiet http://nginx.org/packages/centos/6/noarch/RPMS/nginx-release-centos-6-0.el6.ngx.noarch.rpm
 
 # install nginx
-yum install nginx
+sudo yum -y install nginx
 
 # install supervisor, gunicorn, flask
 /home/vagrant/miniconda2/bin/conda install flask -y
@@ -27,11 +27,11 @@ sudo cp $APPS_DIR/devops/nginx.conf /etc/nginx/
 sudo service nginx start
 
 # create supervisor config folder and copy config files to it
-sudo pmkdir /etc/supervisor
+sudo mkdir /etc/supervisor
 sudo cp $APPS_DIR/devops/supervisord.conf /etc/supervisor/
 sudo cp $APPS_DIR/devops/gunicorn_supervisor.ini /etc/supervisor/
 
-sudo cp $APPS_DIR/devops/supervisord.sh /etc/init.d/
-sudo chmod +x /etc/init.d/supervisor.sh
-sudo /etc/init.d/supervisor.sh start
+sudo cp $APPS_DIR/devops/supervisord.sh /etc/init.d/supervisord
+sudo chmod +x /etc/init.d/supervisord
+sudo /etc/init.d/supervisord start
 sudo chkconfig --add supervisord

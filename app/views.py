@@ -73,7 +73,7 @@ def sleepdivision():
 
     sleeptime = args.get('sleeptime', 5)
     numerator = args.get('numerator', 10)
-    dominator = args.get('dominator', 1)
+    dominator = args.get('denominator', 1)
 
     # business logic
     time.sleep(sleeptime)
