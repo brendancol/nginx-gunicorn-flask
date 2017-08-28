@@ -38,8 +38,8 @@ fi
 
 # Path to the supervisorctl script, server binary,
 # and short-form for messages.
-supervisorctl=/home/vagrant/miniconda2/bin/supervisorctl
-supervisord=/home/vagrant/miniconda2/bin/supervisord
+supervisorctl=/usr/local/envs/myenv/bin/supervisorctl
+supervisord=/usr/local/envs/myenv/bin/supervisord
 prog=supervisord
 pidfile=${PIDFILE-/tmp/supervisord.pid}
 lockfile=${LOCKFILE-/var/lock/subsys/supervisord}
