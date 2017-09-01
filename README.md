@@ -12,7 +12,7 @@ PYTHON_ENV=myenv
 PATH=/usr/local/envs/$PYTHON_ENV/bin:/usr/local/bin:$PATH
 ```
 
-#####Install conda & create Python environment
+##### Install conda & create Python environment
 The following code block installs conda into the `/usr/local` directory.  Conda is used to create an isolated Python environment and to install 3rd-party dependencies (e.g. numpy, scipy).
 ```bash
 curl -sSL https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -o /tmp/miniconda.sh
@@ -26,7 +26,7 @@ conda create -n $PYTHON_ENV python=2.7
 source activate $PYTHON_ENV
 ```
 
-#####Install additional dependencies and copy code into app directory
+##### Install additional dependencies and copy code into app directory
 here we are using `conda` to install necessary dependencies including `flask`, `gunicorn`, `gevent`(for async workers), `pytest`, `flask-restful`, `flask`-cors`
 ```bash
 conda install flask -y
@@ -38,7 +38,7 @@ pip install flask-cors
 cd $APPS_DIR && python setup.py install
 ```
 
-Supervisor will be run as a service and will monitor the `gunicorn` daemons. 
+##### Supervisor will be run as a service and will monitor the `gunicorn` daemons. 
 ```bash
 pip install supervisor
 sudo mkdir -p /etc/supervisor
@@ -50,7 +50,7 @@ sudo service supervisord start
 sudo chkconfig --add supervisord
 ```
 
-#####Install and configure Supervisor
+##### Install and configure Nginx
 Supervisor will be run as a service and will monitor the `gunicorn` daemons. 
 ```bash
 sudo rpm -U --quiet http://nginx.org/packages/centos/6/noarch/RPMS/nginx-release-centos-6-0.el6.ngx.noarch.rpm
@@ -70,7 +70,7 @@ Some of the default settings in gunicorn may require tweaking.  These include:
 - `nginx.conf` -> `proxy_connect_timeout`:  If you have a long-running, request (>10s), then you will need to make sure nginx doesn't timeout your worker and kill the process.
 
 
-### Administration
+### Administration Commands
 
 - Restart Nginx: `service nginx restart`
 - Restart Gunicorn: `service supervisord restart`
