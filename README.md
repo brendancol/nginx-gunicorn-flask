@@ -3,7 +3,7 @@ This an example configuration for using Nginx + Gunicorn to serve up a flask app
 
 
 ### Setting up python environment:
-The following shows how to setup an environment and assumes knowledge of bash / RHEL.  The following has been tested on `RHEL 6.8 (Santiago) and assumes you are starting on a fresh OS install (i.e. it is not assumed you have any of these dependencies already installed).
+The following shows how to setup an environment and assumes knowledge of bash / RHEL.  The following has been tested on `RHEL 6.8 (Santiago)` and assumes you are starting on a fresh OS install (i.e. it is not assumed you have any of these dependencies already installed).
 
 Let's create some bash variables to get started. Here we assuming that the flask application will be installed into `/opt/apps` directory, the Python environment will be named `myenv` and we are manually setting the `PATH` variable to include this environment.  This manual setting of the `PATH` variable is not necessary if you already have an environment and activated it using `source activate myenv`. 
 ```bash
