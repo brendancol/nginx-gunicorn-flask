@@ -61,7 +61,7 @@ sudo cp $APPS_DIR/devops/nginx.conf /etc/nginx/
 sudo service nginx start
 ```
 
-#####Additional setup considerations:
+##### Additional setup considerations:
 Some of the default settings in gunicorn may require tweaking.  These include:
 
 - `gunicorn.conf.py` -> `max_requests`: this variable controls how many requests are served by a single gunicorn worker until the worker restarts.  If you are starting any background threads within the flask worker code, you should set this value to `0` so gunicorn doesn't restart the worker and kill your threads
