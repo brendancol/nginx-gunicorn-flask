@@ -66,6 +66,8 @@ Some of the default settings in gunicorn may require tweaking.  These include:
 
 - `gunicorn.conf.py` -> `max_requests`: this variable controls how many requests are served by a single gunicorn worker until the worker restarts.  If you are starting any background threads within the flask worker code, you should set this value to `0` so gunicorn doesn't restart the worker and kill your threads
 - `gunicorn.conf.py` -> `timeout`:  If you have a long-running, request (>10s), then you will need to make sure gunicorn doesn't timeout your worker and kill the process.
+- `gunicorn.conf.py` -> `workers`:  This is number of workers gunicorn will run.  If running on a dedicated machine, this number should be set to `NUM_CORES * 2 + 1`.  If on a shared machine, you will need to make a judgement call about how many workers to run based on competing resource needs. 
+- `gunicorn.conf.py` -> `worker_class`: This is the type of worker to run (`sync` vs. `async` / `gevent`).  When running background threads within gunicorn workers, it seems like running `sync` workers is necessary.  
 - `nginx.conf` -> `proxy_read_timeout`:  If you have a long-running, request (>10s), then you will need to make sure nginx doesn't timeout your worker and kill the process.
 - `nginx.conf` -> `proxy_connect_timeout`:  If you have a long-running, request (>10s), then you will need to make sure nginx doesn't timeout your worker and kill the process.
 
