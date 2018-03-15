@@ -80,8 +80,19 @@ Some of the default settings in gunicorn may require tweaking.  These include:
 
 
 
+------------
 
+### Additional Job Queue Considerations
 
+##### Using Apache Kafka
+
+![alt text](images/kafka.jpg  "Kafka Job Queue Diagram")
+
+1. Request requiring long-running job comes in through Nginx over HTTP.
+
+2. Flask authenticates user, create job token, places token / job arguments into Kafka Queue. 
+
+3. 
 
 
 
