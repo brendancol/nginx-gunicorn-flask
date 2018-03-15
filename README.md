@@ -92,7 +92,11 @@ Some of the default settings in gunicorn may require tweaking.  These include:
 
 2. Flask authenticates user, create job token, places token / job arguments into Kafka Queue. 
 
-3. 
+3. Kafka maintains queue of active, successful, and fail jobs
+
+4. Python worker subscribes to Kafka group and receives jobs
+
+5. Results store to MSSQL
 
 
 
