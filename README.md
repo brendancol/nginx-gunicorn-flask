@@ -86,7 +86,7 @@ Some of the default settings in gunicorn may require tweaking.  These include:
 
 ##### Using Apache Kafka
 
-![alt text](images/kafka.jpg  "Kafka Job Queue Diagram")
+![alt text](images/kafka.png  "Kafka Job Queue Diagram")
 
 1. Request requiring long-running job comes in through Nginx over HTTP.
 
