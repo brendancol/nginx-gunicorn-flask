@@ -6,7 +6,10 @@ import logging
 import logging.handlers
 import os
 
+from celery import Celery
+
 __version__ = '0.1.0'
+
 
 app = Flask(__name__)
 app.debug = True
@@ -15,8 +18,33 @@ app.debug = True
 app.config['CORS_HEADERS'] = "Content-Type"
 app.config['CORS_RESOURCES'] = {r"/*": {"origins": "*"}}
 
+app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379'
+app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379'
+
 cors = CORS(app)
 app.wsgi_app = ProxyFix(app.wsgi_app)
+
+
+def make_celery(app):
+
+    celery = Celery(app.import_name,
+                    backend=app.config['CELERY_RESULT_BACKEND'],
+                    broker=app.config['CELERY_BROKER_URL'])
+
+    celery.conf.update(app.config)
+
+    TaskBase = celery.Task
+
+    class ContextTask(TaskBase):
+        abstract = True
+
+        def __call__(self, *args, **kwargs):
+            with app.app_context():
+                return TaskBase.__call__(self, *args, **kwargs)
+
+    celery.Task = ContextTask
+    return celery
+
 
 formatter = logging.Formatter('%(asctime)s - %(name)s - \
                               %(levelname)s - %(message)s')
@@ -30,4 +58,6 @@ file_handler.setLevel(logging.DEBUG)
 
 app.logger.addHandler(file_handler)
 
-from app import views
+from app import views  # NOQA
+
+celery = make_celery(app)
