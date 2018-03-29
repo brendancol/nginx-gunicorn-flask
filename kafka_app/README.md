@@ -1,5 +1,7 @@
 ### Kafka as Message Queue Prototype
 
+This is based on https://github.com/joowani/kq
+
 ### Using separate terminals (or screen / tmux), start the following processes:
 
 ##### Setup Python Environment
