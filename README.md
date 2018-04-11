@@ -33,8 +33,10 @@ conda install flask -y
 conda install gunicorn -y
 conda install gevent -y
 conda install pytest -y
+conda install celery
 pip install flask-restful
 pip install flask-cors
+git clone <this-repo> $APPS_DIR
 cd $APPS_DIR && python setup.py install
 ```
 
@@ -45,7 +47,7 @@ sudo mkdir -p /etc/supervisor
 sudo cp $APPS_DIR/devops/supervisord.conf /etc/supervisor/
 sudo cp $APPS_DIR/devops/gunicorn_supervisor.ini /etc/supervisor/
 sudo cp $APPS_DIR/devops/supervisord.sh /etc/rc.d/init.d/supervisord
-sudo chmod .+x /etc/rc.d/init.d/supervisord
+sudo chmod +x /etc/rc.d/init.d/supervisord
 sudo service supervisord start
 sudo chkconfig --add supervisord
 ```
