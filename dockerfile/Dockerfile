@@ -47,7 +47,7 @@ RUN rpm -U --quiet http://nginx.org/packages/centos/6/noarch/RPMS/nginx-release-
     cp $APPS_DIR/devops/nginx.conf /etc/nginx/            &&\
     yum clean all
 
-RUN source activate $PYTHON_ENV     $$ \
+RUN source activate $PYTHON_ENV     && \
     conda install psutil
 
 
