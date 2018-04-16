@@ -23,6 +23,7 @@ RUN source activate $PYTHON_ENV                                   &&\
     conda install gevent                                          &&\
     conda install pytest                                          &&\
     conda install celery                                          &&\
+    conda install psutil                                          &&\
     conda clean --all --yes                                       &&\
     pip install flask-restful                                     &&\
     pip install flask-cors
@@ -46,9 +47,6 @@ RUN rpm -U --quiet http://nginx.org/packages/centos/6/noarch/RPMS/nginx-release-
     mv /etc/nginx/nginx.conf /etc/nginx/nginx.conf-orig   &&\
     cp $APPS_DIR/devops/nginx.conf /etc/nginx/            &&\
     yum clean all
-
-RUN source activate $PYTHON_ENV     && \
-    conda install psutil
 
 
 EXPOSE 80
