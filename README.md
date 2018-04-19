@@ -79,6 +79,9 @@ Some of the default settings in gunicorn may require tweaking.  These include:
 - Restart Nginx: `service nginx restart`
 - Restart Gunicorn: `service supervisord restart`
 - Manually kill gunicorn workers: `killall -s KILL gunicorn`
+- Change the number of gunicorn workers:
+  * increase by one: `# kill -TTIN $masterpid`
+  * decrease by one: `# kill -TTOU $masterpid`
 
 
 ### Docker container
