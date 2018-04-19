@@ -10,9 +10,19 @@ from celery import Celery
 
 __version__ = '0.1.0'
 
-
 app = Flask(__name__)
 app.debug = True
+
+
+# ============================================
+# Here is where we read our data structure
+# and share it with the other worker through
+# Flask config struct:
+#
+from app import data
+app.config['data'] = data.data
+# ============================================
+
 
 # Set CORS options on app configuration
 app.config['CORS_HEADERS'] = "Content-Type"
@@ -58,6 +68,14 @@ file_handler.setLevel(logging.DEBUG)
 
 app.logger.addHandler(file_handler)
 
+
+# ============================================
+# Here is where the app (practically speaking)
+# in this example is loaded to next be
+# instanciated in the queue/farm system
+#
 from app import views  # NOQA
+# ============================================
+
 
 celery = make_celery(app)
