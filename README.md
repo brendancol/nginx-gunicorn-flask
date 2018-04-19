@@ -2,7 +2,7 @@
 This an example configuration for using Nginx + Gunicorn to serve up a flask application.
 
 
-### Setting up python environment:
+### Setting up python environment
 The following shows how to setup an environment and assumes knowledge of bash / RHEL.  The following has been tested on `RHEL 6.8 (Santiago)` and assumes you are starting on a fresh OS install (i.e. it is not assumed you have any of these dependencies already installed).
 
 Let's create some bash variables to get started. Here we assuming that the flask application will be installed into `/opt/apps` directory, the Python environment will be named `myenv` and we are manually setting the `PATH` variable to include this environment.  This manual setting of the `PATH` variable is not necessary if you already have an environment and activated it using `source activate myenv`. 
@@ -40,7 +40,7 @@ git clone <this-repo> $APPS_DIR
 cd $APPS_DIR && python setup.py install
 ```
 
-##### Supervisor will be run as a service and will monitor the `gunicorn` daemons. 
+##### Supervisor will be run as a service and will monitor the `gunicorn` daemons
 ```bash
 pip install supervisor
 sudo mkdir -p /etc/supervisor
@@ -79,6 +79,50 @@ Some of the default settings in gunicorn may require tweaking.  These include:
 - Restart Nginx: `service nginx restart`
 - Restart Gunicorn: `service supervisord restart`
 - Manually kill gunicorn workers: `killall -s KILL gunicorn`
+
+
+### Docker container
+
+This repo provides a Dockerfile with all the [setup steps](#Setting-up-python-environment) necessary.
+The app (*i.e,* this repo) is also there, pre-installed.
+
+To build the container, go to `dockerfile/` dir and run:
+```bash
+# docker build -t nginx_gunicorn_flask .
+```
+(notice the period at the end)
+
+Once the container was succesfully built, we can run it with:
+```bash
+# docker run -it -p 80:80 nginx_gunicorn_flask
+```
+
+And you should now be able to see in your (host) browser the service working by visiting `http://localhost`.
+
+
+##### Running the container with your current repository (sharing host/container directory)
+For various reasons, you may want to use your current repository -- *i.e,* the repository in your host system -- to run the app from inside the container.
+This can be done by using docker *volumes*.
+Say your copy of this repository is in your home, `$HOME/nginx-gunicorn-flask`; And remember the app (or this repo *inside* the container) is at `$APPS_DIR=/opt/apps`.
+What we have to do is:
+
+```bash
+[host]# docker run -it -v $HOME/nginx-gunicorn-flask:/opt/apps -p 80:80 nginx_gunicorn_flask
+```
+
+Then, inside the container, we should just refresh our setup:
+```bash
+[container]# cd $APPS_DIR
+[container]# pip install -e .
+```
+
+Restart the daemons:
+```bash
+[container]# service nginx restart
+[container]# service supervisord restart
+```
+
+If everything works fine, your (host) browser should answer to `http://localhost`.
 
 
 
