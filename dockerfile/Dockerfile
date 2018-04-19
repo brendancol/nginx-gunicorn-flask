@@ -24,6 +24,7 @@ RUN source activate $PYTHON_ENV                                   &&\
     conda install pytest                                          &&\
     conda install celery                                          &&\
     conda install psutil                                          &&\
+    conda install numpy                                           &&\
     conda clean --all --yes                                       &&\
     pip install flask-restful                                     &&\
     pip install flask-cors
