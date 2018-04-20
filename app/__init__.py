@@ -72,7 +72,7 @@ app.logger.addHandler(file_handler)
 # ============================================
 # Here is where the app (practically speaking)
 # in this example is loaded to next be
-# instanciated in the queue/farm system
+# instaniated in the queue/farm system
 #
 from app import views  # NOQA
 # ============================================
