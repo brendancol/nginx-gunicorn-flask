@@ -84,7 +84,7 @@ Some of the default settings in gunicorn may require tweaking.  These include:
   - decrease by one: `# kill -TTOU $masterpid`
 
 
-### Docker container
+### Docker container (added 2018-03)
 
 This repo provides a Dockerfile with all the [setup steps](#Setting-up-python-environment) necessary.
 The app (*i.e,* this repo) is also there, pre-installed.
