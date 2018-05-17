@@ -5,7 +5,7 @@ This an example configuration for using Nginx + Gunicorn to serve up a flask app
 ### Setting up python environment
 The following shows how to setup an environment and assumes knowledge of bash / RHEL.  The following has been tested on `RHEL 6.8 (Santiago)` and assumes you are starting on a fresh OS install (i.e. it is not assumed you have any of these dependencies already installed).
 
-Let's create some bash variables to get started. Here we assuming that the flask application will be installed into `/opt/apps` directory, the Python environment will be named `myenv` and we are manually setting the `PATH` variable to include this environment.  This manual setting of the `PATH` variable is not necessary if you already have an environment and activated it using `source activate myenv`. 
+Let's create some bash variables to get started. Here we assuming that the flask application will be installed into `/opt/apps` directory, the Python environment will be named `myenv` and we are manually setting the `PATH` variable to include this environment.  This manual setting of the `PATH` variable is not necessary if you already have an environment and activated it using `source activate myenv`.
 ```bash
 APPS_DIR=/opt/apps
 PYTHON_ENV=myenv
@@ -20,7 +20,7 @@ bash /tmp/miniconda.sh -bfp /usr/local
 rm -rf /tmp/miniconda.sh
 conda clean --all --yes
 conda update conda
-conda config --add channels conda-forge 
+conda config --add channels conda-forge
 conda config --set always_yes yes --set changeps1 no
 conda create -n $PYTHON_ENV python=2.7
 source activate $PYTHON_ENV
@@ -53,7 +53,7 @@ sudo chkconfig --add supervisord
 ```
 
 ##### Install and configure Nginx
-Supervisor will be run as a service and will monitor the `gunicorn` daemons. 
+Supervisor will be run as a service and will monitor the `gunicorn` daemons.
 ```bash
 sudo rpm -U --quiet http://nginx.org/packages/centos/6/noarch/RPMS/nginx-release-centos-6-0.el6.ngx.noarch.rpm
 sudo yum -y install nginx
@@ -68,8 +68,8 @@ Some of the default settings in gunicorn may require tweaking.  These include:
 
 - `gunicorn.conf.py` -> `max_requests`: this variable controls how many requests are served by a single gunicorn worker until the worker restarts.  If you are starting any background threads within the flask worker code, you should set this value to `0` so gunicorn doesn't restart the worker and kill your threads
 - `gunicorn.conf.py` -> `timeout`:  If you have a long-running, request (>10s), then you will need to make sure gunicorn doesn't timeout your worker and kill the process.
-- `gunicorn.conf.py` -> `workers`:  This is number of workers gunicorn will run.  If running on a dedicated machine, this number should be set to `NUM_CORES * 2 + 1`.  If on a shared machine, you will need to make a judgement call about how many workers to run based on competing resource needs. 
-- `gunicorn.conf.py` -> `worker_class`: This is the type of worker to run (`sync` vs. `async` / `gevent`).  When running background threads within gunicorn workers, it seems like running `sync` workers is necessary.  
+- `gunicorn.conf.py` -> `workers`:  This is number of workers gunicorn will run.  If running on a dedicated machine, this number should be set to `NUM_CORES * 2 + 1`.  If on a shared machine, you will need to make a judgement call about how many workers to run based on competing resource needs.
+- `gunicorn.conf.py` -> `worker_class`: This is the type of worker to run (`sync` vs. `async` / `gevent`).  When running background threads within gunicorn workers, it seems like running `sync` workers is necessary.
 - `nginx.conf` -> `proxy_read_timeout`:  If you have a long-running, request (>10s), then you will need to make sure nginx doesn't timeout your worker and kill the process.
 - `nginx.conf` -> `proxy_connect_timeout`:  If you have a long-running, request (>10s), then you will need to make sure nginx doesn't timeout your worker and kill the process.
 
@@ -91,13 +91,13 @@ The app (*i.e,* this repo) is also there, pre-installed.
 
 To build the container, go to `dockerfile/` dir and run:
 ```bash
-# docker build -t nginx_gunicorn_flask .
+$ docker build -t nginx_gunicorn_flask .
 ```
 (notice the period at the end)
 
 Once the container was succesfully built, we can run it with:
 ```bash
-# docker run -it -p 80:80 nginx_gunicorn_flask
+$ docker run -it -p 80:80 nginx_gunicorn_flask
 ```
 
 And you should now be able to see in your (host) browser the service working by visiting `http://localhost`.
@@ -110,19 +110,19 @@ Say your copy of this repository is in your home, `$HOME/nginx-gunicorn-flask`; 
 What we have to do is:
 
 ```bash
-[host]# docker run -it -v $HOME/nginx-gunicorn-flask:/opt/apps -p 80:80 nginx_gunicorn_flask
+[host]$ docker run -it -v $HOME/nginx-gunicorn-flask:/opt/apps -p 80:80 nginx_gunicorn_flask
 ```
 
 Then, inside the container, we should just refresh our setup:
 ```bash
-[container]# cd $APPS_DIR
-[container]# pip install -e .
+[container]$ cd $APPS_DIR
+[container]$ pip install -e .
 ```
 
 Restart the daemons:
 ```bash
-[container]# service nginx restart
-[container]# service supervisord restart
+[container]$ service nginx restart
+[container]$ service supervisord restart
 ```
 
 If everything works fine, your (host) browser should answer to `http://localhost`.
@@ -139,13 +139,10 @@ If everything works fine, your (host) browser should answer to `http://localhost
 
 1. Request requiring long-running job comes in through Nginx over HTTP.
 
-2. Flask authenticates user, create job token, places token / job arguments into Kafka Queue. 
+2. Flask authenticates user, create job token, places token / job arguments into Kafka Queue.
 
 3. Kafka maintains queue of active, successful, and fail jobs
 
 4. Python worker subscribes to Kafka group and receives jobs
 
 5. Results store to MSSQL
-
-
-
