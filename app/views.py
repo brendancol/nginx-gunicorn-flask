@@ -1,8 +1,13 @@
 from __future__ import division
 
 import os
+import random
+import gc
+
 # - third-party
 from flask import jsonify
+import numpy as np
+from scipy import sparse
 
 # - app specific
 from app import app
@@ -10,40 +15,103 @@ from app import app
 import psutil
 process = psutil.Process(os.getpid())
 
+# from memory_profiler import profile
+# # create logger
+# import logging
+# logger = logging.getLogger('memory_profile_log')
+# logger.setLevel(logging.DEBUG)
+#
+# # create file handler which logs even debug messages
+# fh = logging.FileHandler("/tmp/gunicorn_leak/memory_profile.log")
+# fh.setLevel(logging.DEBUG)
+#
+# # add the handlers to the logger
+# logger.addHandler(fh)
+#
+# from memory_profiler import LogFile
+# import sys
+# sys.stdout = LogFile('memory_profile_log', reportIncrementFlag=False)
 
-class Server(object):
-    def __init__(self):
-        self.info = {"Init memory in use (Master)":
-                     process.memory_info().rss/10**6}
 
-app.config['server'] = Server()
+# # @profile
+def predict(buf):
+    #start = gtrc()
+    # Idx1 = random.randint(54,999)
+    # Idx2 = random.randint(50,999)
+    # d1 = data[Idx1]
+    # d2 = data[Idx2]
+#    ts1 =2+np.dot(app.config['data'][Idx1],app.config['data'][Idx2])
+    # s=0
+    # for v in d1*d2:
+    #     s+=v
+    # a = sum(d1*d2)
+    # b = np.dot(d1, d2)
+    data = array_from_buffer(buf)
+    # data * 1
+    r = type(buf).from_buffer(data + data)
+    # assert a==b
+    # a = np.ones(10000)
+    # b = np.ones(10000)
+    # c = np.dot(a,b)
+    # tracer.runfunc(np.dot, d1, d2)
+    # r = tracer.results()
+    # r.write_results(summary=True)
+    # ts1 = 2 #+ np.dot(d1, d2)
+    # return ts1
+
+
+def array_from_buffer(buf):
+    data = np.frombuffer(buf)#.get_obj())
+    # data = data.reshape(N, M)
+    return data
+
+
+def read_matrix(app, idx_0=None, idx_1=None):
+    shape = app.config['matrix_shape']
+    data = app.config['matrix_data']
+    indices = app.config['matrix_indices']
+    indptr = app.config['matrix_indptr']
+    sparse_matrix = sparse.csr_matrix((data, indices, indptr),
+                                      shape=shape, copy=False)
+    return sparse_matrix
 
 
 @app.route('/')
 def root():
-    info = dict(methods=['this a test'])
-    info.update({"RSS memory being used (Worker)":
-                 process.memory_info().rss/10**6})
-    info.update({"SHARED memory being used (Worker)":
-                 process.memory_info().shared/10**6})
-
+    # h=hpy()
     wn = os.getpid()
+    # srv = app.config['server']
+    # if wn in srv.info:
+    #     srv.info[wn] += 1
+    # else:
+    #     srv.info[wn] = 1
 
-    srv = app.config['server']
+    if True:
+        result1 = {}
 
-    if wn in srv.info:
-        srv.info[wn] += 1
-    else:
-        srv.info[wn] = 1
+        Idx1 = random.randint(54,999)
+        Idx2 = random.randint(50,999)
+        # d1 = data[Idx1]
+        # d2 = data[Idx2]
 
-    info.update({"worker node '{}' has been here".format(wn):
-                 "'{}' times".format(srv.info[wn])})
+        matrix = read_matrix(app)
 
-    if wn % 2:
-        _ = app.config['data'].data
-        info.update({"Array was read. RSS Memory in use:":
-                     process.memory_info().rss/10**6})
-        info.update({"Array was read. SHARED Memory in use:":
-                     process.memory_info().shared/10**6})
+        # predict(matrix)
+        s = matrix.sum()
+        m = matrix.mean()
 
-    return jsonify(info)
+        result1["Node_id"] = wn
+        
+        result1["sum"] = s
+        result1["mean"] = m
+
+        result = 'predict'
+        a = gc.collect()
+        result1["Score"] = result
+        result1["Rss"] = process.memory_info().rss/10**6
+        result1["Shared"] = process.memory_info().shared/10**6
+        result1["gc_count1"] = a
+
+    # srv.cnt += 1
+
+    return jsonify(result1)

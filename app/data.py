@@ -1,5 +1,6 @@
 import multiprocessing
-import numpy as np
+# import numpy as np
+from scipy import sparse
 # import ctypes
 
 from os import path
@@ -21,8 +22,17 @@ datadir = path.join(here, 'sample_data')
 # Pickle was disabled to guarantee the object file will be read by other systems.
 #
 fname = path.join(datadir, 'random.npy')
-arr = np.load(fname, mmap_mode=None, allow_pickle=False)
+#arr = np.load(fname, mmap_mode=None, allow_pickle=False)
+# arr = multiprocessing.Array(arr.dtype.kind, arr)
+# data = np.ctypeslib.as_array(arr.get_obj())
+# data = data.reshape(10**3, 10**4)
 
-arr = multiprocessing.Array(arr.dtype.kind, arr)
-data = np.ctypeslib.as_array(arr.get_obj())
-data = data.reshape(10**3, 10**4)
+fname_sparse = path.join(datadir, 'sparse_random.npz')
+sparse_matrix = sparse.load_npz(fname_sparse)
+matrix_data = sparse_matrix.data
+matrix_data = multiprocessing.Array(matrix_data.dtype.kind, matrix_data)
+
+matrix_indx = sparse_matrix.indices
+matrix_indx = multiprocessing.Array(matrix_indx.dtype.kind, matrix_indx)
+
+matrix_indp = sparse_matrix.indptr
