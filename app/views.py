@@ -7,7 +7,9 @@ import gc
 # - third-party
 from flask import jsonify
 import numpy as np
-from scipy import sparse
+# from scipy import sparse
+
+from .read_sparse import read_sparse_elements
 
 # - app specific
 from app import app
@@ -66,14 +68,19 @@ def array_from_buffer(buf):
     return data
 
 
-def read_matrix(app, idx_0=None, idx_1=None):
-    shape = app.config['matrix_shape']
+# def read_matrix(app, idx_0=None, idx_1=None):
+#     shape = app.config['matrix_shape']
+#     data = app.config['matrix_data']
+#     indices = app.config['matrix_indices']
+#     indptr = app.config['matrix_indptr']
+#     sparse_matrix = sparse.csr_matrix((data, indices, indptr),
+#                                       shape=shape, copy=False)
+#     return sparse_matrix
+def read_matrix(app, row_idx, col_idx):
     data = app.config['matrix_data']
-    indices = app.config['matrix_indices']
-    indptr = app.config['matrix_indptr']
-    sparse_matrix = sparse.csr_matrix((data, indices, indptr),
-                                      shape=shape, copy=False)
-    return sparse_matrix
+    rows = app.config['matrix_rows']
+    cols = app.config['matrix_cols']
+    return read_sparse_elements(row_idx, col_idx, data, rows, cols)
 
 
 @app.route('/')
@@ -94,16 +101,21 @@ def root():
         # d1 = data[Idx1]
         # d2 = data[Idx2]
 
-        matrix = read_matrix(app)
+        row_idx = list(range(10))
+        col_idx = list(range(10,30))
+        matrix = read_matrix(app, row_idx, col_idx)
+        # matrix = read_matrix(app)
 
         # predict(matrix)
         s = matrix.sum()
         m = matrix.mean()
 
         result1["Node_id"] = wn
-        
+
         result1["sum"] = s
         result1["mean"] = m
+        result1["ANY"] = '{}'.format(matrix.any())
+        result1["shape"] = '{}'.format(matrix.shape)
 
         result = 'predict'
         a = gc.collect()

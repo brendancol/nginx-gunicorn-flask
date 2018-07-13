@@ -27,12 +27,13 @@ fname = path.join(datadir, 'random.npy')
 # data = np.ctypeslib.as_array(arr.get_obj())
 # data = data.reshape(10**3, 10**4)
 
-fname_sparse = path.join(datadir, 'sparse_random.npz')
+fname_sparse = path.join(datadir, 'sparse_random_coo.npz')
 sparse_matrix = sparse.load_npz(fname_sparse)
 matrix_data = sparse_matrix.data
 matrix_data = multiprocessing.Array(matrix_data.dtype.kind, matrix_data)
 
-matrix_indx = sparse_matrix.indices
-matrix_indx = multiprocessing.Array(matrix_indx.dtype.kind, matrix_indx)
+matrix_rows = sparse_matrix.row
+matrix_rows = multiprocessing.Array(matrix_rows.dtype.kind, matrix_rows)
 
-matrix_indp = sparse_matrix.indptr
+matrix_cols = sparse_matrix.col
+matrix_cols = multiprocessing.Array(matrix_cols.dtype.kind, matrix_cols)
