@@ -1,4 +1,5 @@
 import numpy as np
+from scipy import sparse
 
 
 def read_sparse_element(row_i, col_i, data, rows, cols):
@@ -27,6 +28,13 @@ def read_sparse_element(row_i, col_i, data, rows, cols):
 
 
 def read_sparse_elements(row_is, col_is, data, rows, cols):
+    '''
+    Here I am considering the `row_is` and `col_is` are lists
+    of contiguous indexes representing slices in rows and columns, resp.
+    E.g,
+     * row_is = [2,3,4,5]
+     * col_is = [4,5,6,7,8,9,10,11]
+    '''
     assert isinstance(row_is, list) and len(row_is)
     assert isinstance(col_is, list) and len(col_is)
 
@@ -36,15 +44,33 @@ def read_sparse_elements(row_is, col_is, data, rows, cols):
     pairs_in = list(product(row_is, col_is))
     assert len(pairs_in) == len(pairs_out)
 
-    mat = np.zeros((len(row_is), len(col_is)))
+    # If you want to have a dense matrix representing the sparse-matrix slice,
+    # uncomment the lines below containing "dense_mat"
+    #
+    # dense_mat = np.zeros((len(row_is), len(col_is)))
+
+    # If a dense-matrix is not of your interest, just use the "sparse_slice" path
+    #
+    sparse_slice = {'data': [],
+                    'rows': [],
+                    'cols': []}
 
     for i in range(len(pairs_in)):
         xy = pairs_in[i]
-        data_elem = read_sparse_element(xy[0], xy[1], data, rows, cols)
         zw = pairs_out[i]
+        data_elem = read_sparse_element(xy[0], xy[1], data, rows, cols)
         if data_elem:
-            mat[zw] = data[data_elem]
+            # dense_mat[zw] = data[data_elem]
+            sparse_slice['data'].append(data[data_elem])
+            sparse_slice['rows'].append(zw[0])
+            sparse_slice['cols'].append(zw[1])
         else:
-            mat[zw] = 0
+            # dense_mat[zw] = 0
+            pass
 
-    return mat
+    # return dense_mat
+    M = len(row_is)
+    N = len(col_is)
+    return sparse.coo_matrix((sparse_slice['data'],
+                              (sparse_slice['rows'], sparse_slice['cols'])
+                              ), shape=(M, N))

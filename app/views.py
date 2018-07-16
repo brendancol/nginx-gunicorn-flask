@@ -42,9 +42,15 @@ def root():
 
         result1["sum"] = str(s)
         result1["mean"] = str(m)
-        result1["ANY"] = '{}'.format(matrix.any())
+
+        if hasattr(matrix, 'any'):
+            result1["ANY"] = '{}'.format(matrix.any())
+            result1["matrix"] = '{}'.format(matrix)
+        else:
+            result1["ANY"] = '{}'.format(matrix.toarray().any())
+            result1["matrix"] = '{}'.format(matrix.data)
+
         result1["shape"] = '{}'.format(matrix.shape)
-        result1["matrix"] = '{}'.format(matrix)
 
         result = 'predict'
         a = gc.collect()
