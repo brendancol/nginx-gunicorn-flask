@@ -18,19 +18,8 @@ def read_sparse_element(row_i, col_i, data, rows, cols):
     of the original COO sparse matrix.
     '''
 
-#    ind_row = np.zeros(len(rows), dtype=bool)
-#    for i in row_i:
-#        ind_row |= (rows == i)
-#    possible_rows = np.where(ind_row)[0]
-#
-#    ind_col = np.zeros(len(cols), dtype=bool)
-#    for i in col_i:
-#        ind_col |= (cols == i)
-#    possible_cols = np.where(ind_col)[0]
     possible_rows = np.where(rows == row_i)[0]
     possible_cols = np.where(cols == col_i)[0]
-    # print(possible_rows)
-    # print(possible_cols)
 
     data_elem = list(set(possible_rows).intersection(possible_cols))
 
@@ -51,10 +40,7 @@ def read_sparse_elements(row_is, col_is, data, rows, cols):
 
     for i in range(len(pairs_in)):
         xy = pairs_in[i]
-        # print(xy)
         data_elem = read_sparse_element(xy[0], xy[1], data, rows, cols)
-        # print('Data-elem',data_elem)
-        # print(mat)
         zw = pairs_out[i]
         if data_elem:
             mat[zw] = data[data_elem]

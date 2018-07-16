@@ -20,8 +20,8 @@ app.debug = True
 # Flask config struct:
 #
 from app import data
-# app.config['data'] = data.data
-app.config['matrix_shape'] = data.sparse_matrix.shape
+
+# app.config['matrix_shape'] = data.sparse_matrix.shape
 app.config['matrix_data'] = data.matrix_data
 app.config['matrix_rows'] = data.matrix_rows
 app.config['matrix_cols'] = data.matrix_cols
