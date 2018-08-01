@@ -154,8 +154,9 @@ executed like:
 $ ./new_client.sh $NEW_USERNAME
 ```
 
-A file named `$NEW_USERNAME.p12` was created that should be send to the user,
-this is the file the user will use to authenticate in the system.
+A file named `$NEW_USERNAME.p12` was created in `/etc/ssl/ca/certs/users` that
+should be send to the user, this is the file the user will use to authenticate
+in the system.
 
 ### Revocate user certificate
 
