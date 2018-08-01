@@ -53,6 +53,7 @@ RUN rpm -U --quiet http://nginx.org/packages/centos/6/noarch/RPMS/nginx-release-
 EXPOSE 80
 EXPOSE 8000
 EXPOSE 8080
+EXPOSE 443
 
 COPY bin/init.sh /init.sh
 
